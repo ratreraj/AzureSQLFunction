@@ -14,8 +14,8 @@ namespace AzureSQLFunction
 {
     public static class GetProduct
     {
-        [FunctionName("GetProduct")]
-        public static async Task<IActionResult> Run(
+        [FunctionName("GetProducts")]
+        public static async Task<IActionResult> RunProducts(
             [HttpTrigger(AuthorizationLevel.Function, "get", Route = null)] HttpRequest req,
             ILogger log)
         {
@@ -55,5 +55,48 @@ namespace AzureSQLFunction
             string con = "Data Source=sqldemoserver001.database.windows.net;Initial Catalog=SQLDbConnection;Persist Security Info=False;User ID=sqladmin;Password=India@123!@#;MultipleActiveResultSets=False;Encrypt=True;TrustServerCertificate=False;Connection Timeout=30;";
             return new SqlConnection(con);
         }
+        [FunctionName("GetProduct")]
+        public static async Task<IActionResult> RunProduct(
+           [HttpTrigger(AuthorizationLevel.Function, "get", Route = null)] HttpRequest req,
+           ILogger log)
+        {
+            int productid = Convert.ToInt32(req.Query["productid"]);
+            string query = $"SELECT ProductID,ProductName,Quantity FROM Products where ProductID={productid}";
+            SqlConnection _sqlConnection = GetSqlConnection();
+            _sqlConnection.Open();
+
+            try
+            {
+              
+                using (SqlCommand cmd = new SqlCommand(query, _sqlConnection))
+                {
+
+                    using (SqlDataReader reader = cmd.ExecuteReader())
+                    {
+                        reader.Read();
+                        Products product = new Products();
+                        product.ProductId = reader.GetInt32(0);
+                        product.ProductName = reader.GetString(1);
+                        product.Quantity    =  reader.GetInt32(2);
+
+                        _sqlConnection.Close();
+                        var res = product;
+                        return new OkObjectResult(res);
+
+                    }
+                }
+
+
+            }
+            catch (Exception)
+            {
+                var res = "No Record Found";
+                _sqlConnection.Close();
+                return new OkObjectResult(res);
+            }
+
+
+        }
+
     }
 }
