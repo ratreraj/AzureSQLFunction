@@ -52,7 +52,8 @@ namespace AzureSQLFunction
 
         private static SqlConnection GetSqlConnection()
         {
-            string con = "Data Source=sqldemoserver001.database.windows.net;Initial Catalog=SQLDbConnection;Persist Security Info=False;User ID=sqladmin;Password=India@123!@#;MultipleActiveResultSets=False;Encrypt=True;TrustServerCertificate=False;Connection Timeout=30;";
+            string con = "Server=tcp:sqldemoserver001.database.windows.net,1433;Initial Catalog=SQLDbConnection;Persist Security Info=False;User ID=sqladmin;Password=India@123!@#;MultipleActiveResultSets=False;Encrypt=True;TrustServerCertificate=False;Connection Timeout=30;";
+            //string con = Environment.GetEnvironmentVariable("SQLAZURECONNSTR_SQLConnectionString",EnvironmentVariableTarget.Process);
             return new SqlConnection(con);
         }
         [FunctionName("GetProduct")]
